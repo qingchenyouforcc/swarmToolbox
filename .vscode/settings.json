@@ -13,6 +13,7 @@
         "ipython",
         "mkdocs",
         "mypy",
+        "Neurosama",
         "nosetests",
         "oconnor",
         "pdm",

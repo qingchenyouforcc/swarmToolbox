@@ -1,0 +1,8 @@
+LICENSE
+README.md
+pyproject.toml
+src/main.py
+src/swarmToolbox.egg-info/PKG-INFO
+src/swarmToolbox.egg-info/SOURCES.txt
+src/swarmToolbox.egg-info/dependency_links.txt
+src/swarmToolbox.egg-info/top_level.txt

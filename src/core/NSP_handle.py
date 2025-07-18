@@ -7,19 +7,17 @@ import os
 import sys
 
 # 智能路径处理：支持直接运行和模块导入
-def _ensure_src_in_path():
-    """确保src模块可以被导入"""
-    try:
-        import src.config
-    except ModuleNotFoundError:
-        # 如果导入失败，添加项目根目录到sys.path
-        current_file = Path(__file__).resolve()
-        project_root = current_file.parent.parent.parent
-        if str(project_root) not in sys.path:
-            sys.path.insert(0, str(project_root))
 
-_ensure_src_in_path()
-from src.config import cfg
+try:
+    from src.config import cfg
+except ModuleNotFoundError:
+    # 如果导入失败，添加项目根目录到sys.path
+    current_file = Path(__file__).resolve()
+    project_root = current_file.parent.parent.parent
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    from src.config import cfg
+
 
 def set_nsp_path(path: str) -> None:
     """设置NSP文件路径"""
@@ -260,7 +258,7 @@ def get_nsp_version() -> tuple[bool, str]:
         return False, f"NSP文件不存在: {nsp_path}"
     
     try:
-        # 尝试获取文件版本信息 (Windows)
+        # 尝试获取文件版本信息 方法1 (Windows)
         if os.name == 'nt':
             try:
                 import win32api
@@ -282,7 +280,8 @@ def get_nsp_version() -> tuple[bool, str]:
                     version_info += f"文件描述: {file_description}\n"
                     version_info += f"公司: {company_name}"
                     
-                except:
+                except Exception as e:
+                    logger.warning(f"获取Windows文件信息失败: {e}")
                     version_info = f"文件: {nsp_file.name}\n版本: {version}"
                 
                 logger.info(f"NSP版本: {version}")
@@ -321,7 +320,8 @@ def get_nsp_version() -> tuple[bool, str]:
                 if result.stdout and ('version' in result.stdout.lower() or 'v' in result.stdout.lower()[:10]):
                     version_info = f"文件: {nsp_file.name}\n版本信息: {result.stdout.strip()[:200]}"
                     return True, version_info
-            except:
+            except Exception as e:
+                logger.warning(f"[方法三]获取版本信息失败: {e}")
                 continue
         
         # 方法4: 返回文件基本信息
@@ -333,7 +333,7 @@ def get_nsp_version() -> tuple[bool, str]:
         basic_info = f"文件: {nsp_file.name}\n"
         basic_info += f"大小: {file_size:.2f} MB\n"
         basic_info += f"修改时间: {modified_time}\n"
-        basic_info += f"说明: 无法获取版本信息，显示文件基本信息"
+        basic_info += "说明: 无法获取版本信息，显示文件基本信息"
         
         logger.info("无法获取NSP版本信息，返回文件基本信息")
         return True, basic_info

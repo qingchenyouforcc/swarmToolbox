@@ -1,6 +1,8 @@
 [project]
-name = "project"
+name = "swarmToolbox"
 version = "0.1.0"
-description = "Add your description here"
+description = "An information center software for fans of neurosama (swarm)"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+
+]

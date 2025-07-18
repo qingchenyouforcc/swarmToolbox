@@ -40,10 +40,10 @@
 
 2.  **安装 `uv`** (如果尚未安装)
     ```bash
+    # 更多安装方式请参考uv官方文档https://github.com/astral-sh/uv#installation
     # Windows (PowerShell)
     irm https://astral.sh/uv/install.ps1 | iex
     ```
-更多安装方式请参考 [uv 官方文档](https://github.com/astral-sh/uv#installation)。
 
 3.  **创建虚拟环境并安装依赖**
     使用 `uv` 可以一键完成虚拟环境创建和依赖安装：

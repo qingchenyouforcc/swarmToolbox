@@ -1,4 +1,9 @@
 {
+    "Applications": {
+        "EVZPath": "",
+        "NeurolingsPath": "",
+        "NSPPath": "C:/neuroSangSpider/NeuroSongSpider.exe"
+    },
     "QFluentWidgets": {
         "ThemeColor": "#ff009faa",
         "ThemeMode": "Auto"

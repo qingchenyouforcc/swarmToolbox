@@ -23,6 +23,25 @@ class Config(QConfig):
         Theme.AUTO,
         OptionsValidator([Theme.AUTO, Theme.LIGHT, Theme.DARK]),
     )
+    
+    # 应用程序路径配置项
+    nsp_path = ConfigItem(
+        "Applications",
+        "NSPPath",
+        ""
+    )
+    
+    evz_path = ConfigItem(
+        "Applications", 
+        "EVZPath",
+        ""
+    )
+    
+    neurolings_path = ConfigItem(
+        "Applications",
+        "NeurolingsPath", 
+        ""
+    )
 
     def __init__(self, path: Path):
         # 指定配置文件路径

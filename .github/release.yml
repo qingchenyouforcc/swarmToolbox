@@ -6,6 +6,7 @@ changelog:
       labels:
         - "feature"
         - "enhancement"
+        - "feat"
     - title: "🐛 修复bug"
       labels:
         - "bug"
@@ -19,6 +20,7 @@ changelog:
     - title: "📖 文档更新"
       labels:
         - "documentation"
+        - "docs"
   
   # 排除某些标签的 PR
   exclude:

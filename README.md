@@ -41,7 +41,7 @@
 2.  **安装 `uv`** (如果尚未安装)
     ```bash
     # Windows (PowerShell)
-    irm [https://astral.sh/uv/install.ps1](https://astral.sh/uv/install.ps1) | iex
+    irm https://astral.sh/uv/install.ps1 | iex
     ```
     更多安装方式请参考 [uv 官方文档](https://github.com/astral-sh/uv#installation)。
 
@@ -65,9 +65,7 @@
 5.  **构建 `.exe` 发行版**
     本项目使用 `PyInstaller` 进行打包。
     ```bash
-    # 首先，确保已在虚拟环境中安装 PyInstaller
-    uv pip install pyinstaller
-
+    # 确保已通过 `uv sync` 安装所有依赖，包括 PyInstaller
     # 然后，使用 spec 文件进行构建（推荐）
     pyinstaller your_project_name.spec
     ```

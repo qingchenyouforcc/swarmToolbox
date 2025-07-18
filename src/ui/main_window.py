@@ -7,23 +7,14 @@ from qfluentwidgets import (
     MessageBox,
     SystemThemeListener,
     Theme,
+    FluentIcon as FIF,
+    NavigationItemPosition,
 )
 from loguru import logger
 
 from src.config import ASSETS_DIR, cfg
-
-
-class HomeInterface:
-    """临时的HomeInterface类，实际应该在单独的文件中定义"""
-    def __init__(self, parent):
-        self.parent = parent
-
-
-class SettingInterface:
-    """临时的SettingInterface类，实际应该在单独的文件中定义"""
-    def __init__(self, parent):
-        self.parent = parent
-
+from src.ui.interface.home.home_interface import HomeInterface
+from src.ui.interface.setting.setting_interface import SettingInterface
 
 class MainWindow(FluentWindow):
     def __init__(self):
@@ -41,7 +32,6 @@ class MainWindow(FluentWindow):
             # 使用默认应用图标
             icon = self.style().standardIcon(self.style().StandardPixmap.SP_ComputerIcon)
 
-        self.homeInterface = HomeInterface(self)
         self.setWindowIcon(icon)
         
         # 创建启动页面
@@ -64,18 +54,18 @@ class MainWindow(FluentWindow):
         self.show()   
 
         # 添加子界面
-        # self.addSubInterface(
-        #     interface=self.homeInterface,
-        #     icon=FIF.HOME,
-        #     text="主页",
-        #     position=NavigationItemPosition.TOP,
-        # )
-        # self.addSubInterface(
-        #     interface=SettingInterface(self),
-        #     icon=FIF.SETTING,
-        #     text="设置",
-        #     position=NavigationItemPosition.BOTTOM,
-        # )
+        self.addSubInterface(
+            interface=HomeInterface(self),
+            icon=FIF.HOME,
+            text="主页",
+            position=NavigationItemPosition.TOP,
+        )
+        self.addSubInterface(
+            interface=SettingInterface(self),
+            icon=FIF.SETTING,
+            text="设置",
+            position=NavigationItemPosition.BOTTOM,
+        )
 
         self.setWindowTitle("swarmToolbox")
             

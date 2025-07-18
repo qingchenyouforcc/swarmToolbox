@@ -5,6 +5,7 @@ description = "An information center software for fans of neurosama (swarm)"
 requires-python = ">=3.13"
 dependencies = [
     "loguru>=0.7.3",
+    "pyinstaller>=6.14.2",
     "pyqt6>=6.9.1",
     "pyqt6-fluent-widgets[full]>=1.8.3",
 ]

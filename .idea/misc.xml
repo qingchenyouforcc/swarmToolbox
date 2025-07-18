@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="uv (project)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="uv (project)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="uv (swarmToolbox)" project-jdk-type="Python SDK" />
 </project>

@@ -94,10 +94,7 @@ def start_nsp_exe() -> bool:
                 
                 logger.info(f"NSP程序已通过CreateProcess独立启动，PID: {process_info[2]}")
                 
-            except ImportError:
-                logger.error("win32api模块未安装，无法使用CreateProcess")
-                logger.info("请安装pywin32: pip install pywin32")
-                return False
+            # Note: ImportError is already handled at the module level.
             except Exception as e:
                 logger.error(f"CreateProcess启动失败: {e}")
                 return False

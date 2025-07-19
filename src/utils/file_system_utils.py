@@ -1,5 +1,3 @@
-from multiprocessing import process
-import re
 from loguru import logger
 from pathlib import Path
 import os
@@ -285,7 +283,7 @@ def get_exe_version(path) -> tuple[bool, str]:
         # 方法4: 返回文件基本信息
         file_stat = file.stat()
         file_size = file_stat.st_size / 1024 / 1024  # MB
-        size += f"{file_size:.2f} MB\n"
+        size = f"{file_size:.2f} MB\n"
 
         logger.info("无法获取版本信息，返回文件大小")
         return True, size
@@ -308,8 +306,8 @@ def check_exe_running(path) -> bool:
     Returns:
         bool: 正在运行返回True
     """
-    process = path.rsplit('/', 1)[-1] or path.rsplit('\\', 1)[-1]
     try:
+        process = path.rsplit('/', 1)[-1] or path.rsplit('\\', 1)[-1]
         # 在Windows上检查进程
         if os.name == 'nt':
             result = subprocess.run(

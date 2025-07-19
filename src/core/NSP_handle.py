@@ -64,15 +64,6 @@ def start_nsp_exe() -> bool:
         
         if os.name == 'nt':
             try:
-                import win32api
-                import win32con
-                import win32process
-                
-                # 使用CreateProcess创建完全独立的进程
-                # 设置创建标志：
-                # CREATE_NEW_PROCESS_GROUP: 创建新的进程组
-                # DETACHED_PROCESS: 分离进程，不继承控制台
-                # CREATE_BREAKAWAY_FROM_JOB: 允许进程脱离作业对象
                 creation_flags = (
                     win32con.CREATE_NEW_PROCESS_GROUP |
                     win32con.DETACHED_PROCESS |
@@ -121,7 +112,7 @@ def start_nsp_exe() -> bool:
                 stderr=subprocess.DEVNULL,
                 stdin=subprocess.DEVNULL,
             )
-            logger.info(f"NSP程序已通过nohup启动")
+            logger.info("NSP程序已通过nohup启动, PROCESS: {process}")
         
         return True
         

@@ -79,7 +79,7 @@ def start_exe(path) -> bool:
 
                 logger.info(f"程序已通过CreateProcess独立启动，PID: {process_info[2]}")
 
-            # Note: ImportError is already handled at the module level.
+            # Handle general exceptions during process creation with CreateProcess.
             except Exception as e:
                 logger.error(f"CreateProcess启动失败: {e}")
                 return False
@@ -391,7 +391,7 @@ def get_exe_usage(path, name="") -> tuple[bool, list[str]]:
         usage_info = []
 
         if memory_info:
-            result = f"找到 {len(processes)} 个NSP进程\n"
+            result = f"找到 {len(processes)} 个进程\n"
             result += f"总内存占用: {total_memory:.2f} MB\n\n"
             logger.info(f"进程内存占用: {total_memory:.2f} MB")
             result += f"总CPU使用率: {total_cpu:.1f}%\n"

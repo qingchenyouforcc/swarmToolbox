@@ -6,6 +6,16 @@ import subprocess
 import os
 import sys
 
+# 导入win32api用于直接调用Windows系统命令
+if os.name == 'nt':
+    try:
+        import win32api
+        import win32con
+        import win32process
+    except ImportError:
+        logger.warning("警告: win32api模块未安装，将使用备选启动方式")
+        logger.warning("请安装pywin32: pip install pywin32")
+
 # 智能路径处理：支持直接运行和模块导入
 
 try:
@@ -49,16 +59,58 @@ def start_nsp_exe() -> bool:
         return False
     
     try:
-        # 使用subprocess.Popen (不阻塞)
+        # 使用win32api.ShellExecute启动，确保完全独立
         logger.info(f"正在启动NSP程序: {nsp_path}")
-        process = subprocess.Popen(
-            [str(nsp_file)],
-            cwd=str(nsp_file.parent),  # 设置工作目录为exe文件所在目录
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            shell=False
-        )
-        logger.info(f"NSP程序已启动，进程ID: {process.pid}")
+        
+        if os.name == 'nt':
+            try:
+                creation_flags = (
+                    win32con.CREATE_NEW_PROCESS_GROUP |
+                    win32con.DETACHED_PROCESS |
+                    0x01000000  # CREATE_BREAKAWAY_FROM_JOB
+                )
+                
+                # 准备启动信息
+                startup_info = win32process.STARTUPINFO()
+                startup_info.dwFlags = win32con.STARTF_USESHOWWINDOW
+                startup_info.wShowWindow = win32con.SW_NORMAL
+                
+                # 创建进程
+                process_info = win32process.CreateProcess(
+                    None,                           # 应用程序名（None表示从命令行获取）
+                    f'"{str(nsp_file)}"',          # 命令行（程序路径）
+                    None,                           # 进程安全属性
+                    None,                           # 线程安全属性
+                    False,                          # 不继承句柄
+                    creation_flags,                 # 创建标志
+                    None,                           # 环境变量（None表示继承）
+                    str(nsp_file.parent),          # 工作目录
+                    startup_info                    # 启动信息
+                )
+                
+                # 立即关闭进程和线程句柄，完全断开关系
+                win32api.CloseHandle(process_info[0])  # 进程句柄
+                win32api.CloseHandle(process_info[1])  # 线程句柄
+                
+                logger.info(f"NSP程序已通过CreateProcess独立启动，PID: {process_info[2]}")
+                
+            # Note: ImportError is already handled at the module level.
+            except Exception as e:
+                logger.error(f"CreateProcess启动失败: {e}")
+                return False
+        else:
+            # 非Windows系统使用nohup
+            nohup_path = os.path.join(nsp_file.parent, "nohup.out")
+            process = subprocess.Popen(
+                f"nohup {str(nsp_file)} > {nohup_path} 2>&1 &",
+                cwd=str(nsp_file.parent),
+                shell=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+            )
+            logger.info(f"NSP程序已通过nohup启动, PROCESS: {process}")
+        
         return True
         
     except FileNotFoundError:
@@ -265,7 +317,7 @@ def get_nsp_version() -> tuple[bool, str]:
                 info = win32api.GetFileVersionInfo(str(nsp_file), "\\")
                 ms = info['FileVersionMS']
                 ls = info['FileVersionLS']
-                version = f"{win32api.HIWORD(ms)}.{win32api.LOWORD(ms)}.{win32api.HIWORD(ls)}.{win32api.LOWORD(ls)}"
+                version = f"{(ms >> 16) & 0xFFFF}.{ms & 0xFFFF}.{(ls >> 16) & 0xFFFF}.{ls & 0xFFFF}"
                 
                 # 获取更多文件信息
                 try:
@@ -343,6 +395,7 @@ def get_nsp_version() -> tuple[bool, str]:
         logger.error(error_msg)
         return False, error_msg
 
+
 if __name__ == "__main__":
     # 测试用例
     test_path = "C:/neuroSangSpider/NeuroSongSpider.exe"
@@ -358,7 +411,6 @@ if __name__ == "__main__":
     if nsp_file.exists():
         print("✅ NSP文件存在")
         
-        # 新功能1: 检查版本信息
         print("\n" + "="*50)
         print("📋 版本信息:")
         success, version_info = get_nsp_version()
@@ -367,7 +419,6 @@ if __name__ == "__main__":
         else:
             print(f"❌ {version_info}")
         
-        # 新功能2: 文件夹占用情况
         print("\n" + "="*50)
         print("📁 文件夹占用情况:")
         success, folder_info = get_nsp_folder_size()
@@ -376,13 +427,11 @@ if __name__ == "__main__":
         else:
             print(f"❌ {folder_info}")
         
-        # 检查是否正在运行
         print("\n" + "="*50)
         print("🔍 进程状态检查:")
         if check_nsp_running():
             print("⚠️  NSP程序已在运行")
             
-            # 新功能3: 内存占用情况
             print("\n📊 内存占用情况:")
             success, memory_info = get_nsp_memory_usage()
             if success:
@@ -421,4 +470,11 @@ if __name__ == "__main__":
         print("   D:/Games/NeuroSongSpider/NeuroSongSpider.exe")
         
     print("\n" + "="*50)
+    
+    # 如果NSP已经成功启动，提示用户可以关闭脚本
+    if check_nsp_running():
+        print("✅ NSP程序已成功启动并正在运行！")
+        print("💡 脚本工作已完成，您可以安全地关闭此窗口")
+        print("   NSP程序将继续在后台运行")
+    
     print("🎯 测试完成！")

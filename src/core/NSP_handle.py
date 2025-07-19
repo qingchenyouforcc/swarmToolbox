@@ -13,8 +13,8 @@ if os.name == 'nt':
         import win32con
         import win32process
     except ImportError:
-        print("警告: win32api模块未安装，将使用备选启动方式")
-        print("请安装pywin32: pip install pywin32")
+        logger.warning("警告: win32api模块未安装，将使用备选启动方式")
+        logger.warning("请安装pywin32: pip install pywin32")
 
 # 智能路径处理：支持直接运行和模块导入
 

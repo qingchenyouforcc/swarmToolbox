@@ -112,7 +112,7 @@ def start_nsp_exe() -> bool:
                 stderr=subprocess.DEVNULL,
                 stdin=subprocess.DEVNULL,
             )
-            logger.info("NSP程序已通过nohup启动, PROCESS: {process}")
+            logger.info(f"NSP程序已通过nohup启动, PROCESS: {process}")
         
         return True
         

@@ -2,8 +2,8 @@ from PyQt6 import QtGui
 from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QApplication
 from qfluentwidgets import (
-    FluentWindow, 
-    SplashScreen, 
+    FluentWindow,
+    SplashScreen,
     MessageBox,
     SystemThemeListener,
     Theme,
@@ -16,13 +16,14 @@ from src.config import ASSETS_DIR, cfg
 from src.ui.interface.home.home_interface import HomeInterface
 from src.ui.interface.setting.setting_interface import SettingInterface
 
+
 class MainWindow(FluentWindow):
     def __init__(self):
         super().__init__()
-        
+
         # 系统主题监听器
         self.themeListener = SystemThemeListener(self)
-        
+
         self.setObjectName("demoWindow")
         # 使用默认图标，如果main.ico不存在的话
         icon_path = ASSETS_DIR / "main.ico"
@@ -33,25 +34,25 @@ class MainWindow(FluentWindow):
             icon = self.style().standardIcon(self.style().StandardPixmap.SP_ComputerIcon)
 
         self.setWindowIcon(icon)
-        
+
         # 创建启动页面
         self.splashScreen = SplashScreen(self.windowIcon(), self)
         self.splashScreen.setIconSize(QSize(64, 64))
-        
+
         # 设置初始窗口大小
         desktop = QApplication.primaryScreen()
         if desktop:  # 确保 desktop 对象不是 None
-            self.resize(QSize(680, 530)) 
-        # self.resize(QSize(desktop.availableGeometry().width() // 2, desktop.availableGeometry().height() // 2))
+            self.resize(QSize(680, 530))
+            # self.resize(QSize(desktop.availableGeometry().width() // 2, desktop.availableGeometry().height() // 2))
         else:  # 如果获取不到主屏幕信息，给一个默认大小
             self.resize(QSize(680, 530))
-            
+
         # TODO 实现按照配置文件主题切换，bug没修好
         # 临时方案：按照系统主题修改
-        cfg.set_theme(Theme.AUTO) 
+        cfg.set_theme(Theme.AUTO)
         logger.info("应用默认主题: AUTO")
 
-        self.show()   
+        self.show()
 
         # 添加子界面
         self.addSubInterface(
@@ -68,7 +69,7 @@ class MainWindow(FluentWindow):
         )
 
         self.setWindowTitle("swarmToolbox")
-            
+
         # 隐藏启动页面
         self.splashScreen.finish()
 

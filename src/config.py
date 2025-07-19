@@ -6,12 +6,14 @@ from qfluentwidgets import QConfig, ConfigItem, OptionsValidator, setTheme
 from qfluentwidgets import Theme as QtTheme
 from loguru import logger
 
+
 class Theme(str, Enum):
     """主题枚举"""
 
     AUTO = "Auto"
     LIGHT = "Light"
     DARK = "Dark"
+
 
 class Config(QConfig):
     """应用程序配置类"""
@@ -23,23 +25,23 @@ class Config(QConfig):
         Theme.AUTO,
         OptionsValidator([Theme.AUTO, Theme.LIGHT, Theme.DARK]),
     )
-    
+
     # 应用程序路径配置项
     nsp_path = ConfigItem(
         "Applications",
         "NSPPath",
         ""
     )
-    
+
     evz_path = ConfigItem(
-        "Applications", 
+        "Applications",
         "EVZPath",
         ""
     )
-    
+
     neurolings_path = ConfigItem(
         "Applications",
-        "NeurolingsPath", 
+        "NeurolingsPath",
         ""
     )
 
@@ -54,6 +56,7 @@ class Config(QConfig):
         self.theme_mode.value = theme
         self.save()
 
+
 IS_WINDOWS = sys.platform == "win32"
 
 MAIN_PATH = Path.cwd()
@@ -66,13 +69,10 @@ DATA_DIR.mkdir(exist_ok=True)
 CONFIG_PATH = DATA_DIR / "config.json"
 cfg = Config(CONFIG_PATH)
 
-
 if CONFIG_PATH.exists():
     cfg.load()
-    
+
 else:
     logger.info("未找到配置文件，正在应用默认主题: AUTO")
-    cfg.set_theme(Theme.AUTO) 
-    setTheme(QtTheme.AUTO)  
-    
-    
+    cfg.set_theme(Theme.AUTO)
+    setTheme(QtTheme.AUTO)

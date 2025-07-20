@@ -8,7 +8,7 @@ import sys
 try:
     from src.config import cfg
     from src.utils.file_system_utils import (
-        start_exe, check_exe_running)
+        start_exe)
 except ModuleNotFoundError:
     # 如果导入失败，添加项目根目录到sys.path
     current_file = Path(__file__).resolve()
@@ -17,7 +17,7 @@ except ModuleNotFoundError:
         sys.path.insert(0, str(project_root))
     from src.config import cfg
     from src.utils.file_system_utils import (
-        start_exe, check_exe_running, get_exe_usage)
+        start_exe)
 
 
 def set_nl_path(path: str) -> None:

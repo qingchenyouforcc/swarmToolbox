@@ -210,7 +210,8 @@ def start_exe_used_bat(path, bat_content) -> bool:
                 try:
                     if 'bat_file_path' in locals():
                         os.unlink(bat_file_path)
-                except:
+                except Exception as e:
+                    logger.warning(f"删除临时文件失败: {e}")
                     pass
                 return False
         else:

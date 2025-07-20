@@ -1,7 +1,7 @@
 {
     "Applications": {
-        "EVZPath": "",
-        "NeurolingsPath": "",
+        "EVZPath": "D:\\EVZ\\EVZ1.4T24.exe",
+        "NeurolingsPath": "C:\\The-Neuroling-Collection\\Neurolings.exe",
         "NSPPath": "C:/neuroSangSpider/NeuroSongSpider.exe"
     },
     "QFluentWidgets": {

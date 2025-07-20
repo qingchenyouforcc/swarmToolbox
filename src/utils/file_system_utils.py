@@ -109,6 +109,128 @@ def start_exe(path) -> bool:
         return False
 
 
+def start_exe_used_bat(path, bat_content) -> bool:
+    """使用批处理文件启动exe。
+    
+    生成临时批处理文件并异步执行，适用于Windows系统
+    
+    Parameters:
+        path: str
+        bat_content: str
+    
+    Returns:
+        bool: 启动成功返回True，失败返回False
+    """
+    if not path:
+        logger.error("路径未设置")
+        return False
+    
+    if not bat_content:
+        logger.error("批处理内容未设置")
+        return False
+
+    file = Path(path)
+
+    # 检查文件是否存在
+    if not file.exists():
+        logger.error(f"文件不存在: {path}")
+        return False
+
+    # 检查是否为可执行文件
+    if not file.suffix.lower() == '.exe':
+        logger.error(f"文件不是可执行文件: {path}")
+        return False
+
+    try:
+        logger.info(f"正在通过批处理文件启动程序: {path}")
+
+        if os.name == 'nt':
+            try:
+                # 生成临时批处理文件
+                import tempfile
+                with tempfile.NamedTemporaryFile(mode='w', suffix='.bat', delete=False, encoding='gbk') as bat_file:
+                    # 将传入的bat_content写入临时文件
+                    bat_file.write(bat_content)
+                    bat_file.write('\n')
+                    # 添加启动exe的命令
+                    bat_file.write(f'cd /d "{str(file.parent)}"\n')
+                    bat_file.write(f'"{str(file)}"\n')
+                    bat_file_path = bat_file.name
+
+                logger.info(f"临时批处理文件已创建: {bat_file_path}")
+
+                # 使用win32api启动批处理文件
+                creation_flags = (
+                        win32con.CREATE_NEW_PROCESS_GROUP |
+                        win32con.DETACHED_PROCESS |
+                        0x01000000  # CREATE_BREAKAWAY_FROM_JOB
+                )
+
+                # 准备启动信息
+                startup_info = win32process.STARTUPINFO()
+                startup_info.dwFlags = win32con.STARTF_USESHOWWINDOW
+                startup_info.wShowWindow = win32con.SW_NORMAL
+
+                # 创建进程执行批处理文件
+                process_info = win32process.CreateProcess(
+                    None,  # 应用程序名
+                    f'cmd.exe /c "{bat_file_path}"',  # 命令行
+                    None,  # 进程安全属性
+                    None,  # 线程安全属性
+                    False,  # 不继承句柄
+                    creation_flags,  # 创建标志
+                    None,  # 环境变量
+                    str(file.parent),  # 工作目录
+                    startup_info  # 启动信息
+                )
+
+                # 立即关闭进程和线程句柄，完全断开关系
+                win32api.CloseHandle(process_info[0])  # 进程句柄
+                win32api.CloseHandle(process_info[1])  # 线程句柄
+
+                logger.info(f"程序已通过批处理文件独立启动，PID: {process_info[2]}")
+
+                # 延迟删除临时批处理文件（给进程一些启动时间）
+                import threading
+                import time
+                def cleanup_bat_file():
+                    time.sleep(5)  # 等待5秒确保批处理文件已被使用
+                    try:
+                        os.unlink(bat_file_path)
+                        logger.info(f"临时批处理文件已删除: {bat_file_path}")
+                    except Exception as e:
+                        logger.warning(f"删除临时批处理文件失败: {e}")
+                
+                cleanup_thread = threading.Thread(target=cleanup_bat_file, daemon=True)
+                cleanup_thread.start()
+
+            except Exception as e:
+                logger.error(f"通过批处理文件启动失败: {e}")
+                # 尝试清理临时文件
+                try:
+                    if 'bat_file_path' in locals():
+                        os.unlink(bat_file_path)
+                except:
+                    pass
+                return False
+        else:
+            # 非Windows系统，使用shell脚本方式
+            logger.warning("非Windows系统，批处理文件功能仅适用于Windows")
+            return False
+
+        return True
+
+    except FileNotFoundError:
+        logger.error(f"找不到可执行文件: {path}")
+        return False
+    except PermissionError:
+        logger.error(f"没有权限执行文件: {path}")
+        return False
+    except Exception as e:
+        logger.error(f"启动程序失败: {e}")
+        return False
+
+
 def start_exe_blocking(path) -> tuple[bool, str]:
     """启动exe并等待执行完成。
     
@@ -307,7 +429,11 @@ def check_exe_running(path) -> bool:
         bool: 正在运行返回True
     """
     try:
-        process = path.rsplit('/', 1)[-1] or path.rsplit('\\', 1)[-1]
+        # 正确提取文件名
+        file_path = Path(path)
+        process = file_path.name
+        logger.info(f"正在检查进程: {process}")
+        
         # 在Windows上检查进程
         if os.name == 'nt':
             result = subprocess.run(
@@ -327,6 +453,81 @@ def check_exe_running(path) -> bool:
     except Exception as e:
         logger.error(f"检查进程失败: {e}")
         return False
+
+
+def kill_exe(path) -> tuple[bool, str]:
+    """结束指定程序的进程。
+    
+    根据程序路径查找并结束相关进程
+    支持多系统处理
+    
+    Parameters:
+        path: str
+    
+    Returns:
+        result: tuple[bool, str]: (是否成功, 结果信息)
+    """
+    if not path:
+        return False, "路径未设置"
+    
+    try:
+        # 正确提取文件名
+        file_path = Path(path)
+        process = file_path.name
+        process_name = process.rsplit(".exe")[0]
+        
+        logger.info(f"正在查找并结束进程: {process}")
+        
+        # 查找相关进程
+        processes_found = []
+        for proc in psutil.process_iter(['pid', 'name']):
+            try:
+                if process_name in proc.info['name'] or process_name.lower() in proc.info['name'].lower():
+                    processes_found.append(proc)
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
+        
+        if not processes_found:
+            return False, f"未找到进程: {process}"
+        
+        # 结束找到的进程
+        killed_count = 0
+        failed_count = 0
+        
+        for proc in processes_found:
+            try:
+                pid = proc.pid
+                proc.terminate()  # 优雅结束
+                
+                # 等待进程结束（最多等待3秒）
+                try:
+                    proc.wait(timeout=3)
+                    logger.info(f"进程 {pid} 已结束")
+                    killed_count += 1
+                except psutil.TimeoutExpired:
+                    # 如果优雅结束失败，强制结束
+                    proc.kill()
+                    logger.info(f"进程 {pid} 已强制结束")
+                    killed_count += 1
+                    
+            except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+                logger.warning(f"结束进程失败: {e}")
+                failed_count += 1
+                continue
+        
+        if killed_count > 0:
+            result_msg = f"成功结束 {killed_count} 个进程"
+            if failed_count > 0:
+                result_msg += f"，{failed_count} 个进程结束失败"
+            logger.info(result_msg)
+            return True, result_msg
+        else:
+            return False, f"所有进程结束失败，共 {failed_count} 个"
+            
+    except Exception as e:
+        error_msg = f"结束进程时发生错误: {e}"
+        logger.error(error_msg)
+        return False, error_msg
 
 
 def get_exe_usage(path, name="") -> tuple[bool, list[str]]:
@@ -350,13 +551,15 @@ def get_exe_usage(path, name="") -> tuple[bool, list[str]]:
     """
     try:
         processes = []
-        process = path.rsplit('/', 1)[-1] or path.rsplit('\\', 1)[-1]
+        # 正确提取文件名
+        file_path = Path(path)
+        process = file_path.name
 
         # 查找相关进程
         for proc in psutil.process_iter(['pid', 'name', 'memory_info', 'cpu_percent']):
             try:
-                if f"{process.rsplit(".exe")[0]}" in proc.info['name'] or f"{process.rsplit(".exe")[0]}".lower() in \
-                        proc.info['name'].lower():
+                process_name = process.rsplit(".exe")[0]
+                if process_name in proc.info['name'] or process_name.lower() in proc.info['name'].lower():
                     processes.append(proc)
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 continue

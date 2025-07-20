@@ -7,7 +7,7 @@
 ## ✨ 主要功能
 
 * **一键启动中心**:
-  * 快速启动社区项目 `neuroSangSpider`。
+  * 快速启动社区项目 `neuroSangSpider`等。
   * 支持启动 `Evil vs Zombies` 游戏。
 
 * **直播动态追踪**:

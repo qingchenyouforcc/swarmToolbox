@@ -29,7 +29,7 @@ def set_nsp_path(path: str) -> None:
 
 if __name__ == "__main__":
     # 测试用例
-    test_path = "C:/neuroSangSpider/NeuroSongSpider.exe"
+    test_path = r"C:/neuroSangSpider/NeuroSongSpider.exe"
     print("=== NSP处理器测试 ===")
 
     # 设置路径

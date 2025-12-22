@@ -7,7 +7,7 @@
 ## ✨ 主要功能
 
 * **一键启动中心**:
-  * 快速启动社区项目 `neuroSangSpider`。
+  * 快速启动社区项目 `neuroSangSpider`等。
   * 支持启动 `Evil vs Zombies` 游戏。
 
 * **直播动态追踪**:
@@ -16,6 +16,7 @@
 
 * **内容聚合**:
   * 自动爬取并展示 Bilibili 平台最新的 Neurosama 相关切片视频。
+  * 自动爬取并展示 YouTube 平台最新的 Neurosama 相关切片视频。
 
 * **资讯中心**:
   * 汇聚来自 `neuroSangSpider` 项目的最新资讯与更新。

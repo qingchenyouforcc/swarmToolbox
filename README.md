@@ -7,7 +7,7 @@
 ## ✨ 主要功能
 
 * **一键启动中心**:
-  * 快速启动社区项目 `neuroSangSpider`等。
+  * 快速启动社区项目 [`neuroSangSpider`](https://github.com/qingchenyouforcc/neuroSangSpider) 等。
   * 支持启动 `Evil vs Zombies` 游戏。
 
 * **直播动态追踪**:
@@ -19,7 +19,7 @@
   * 自动爬取并展示 YouTube 平台最新的 Neurosama 相关切片视频。
 
 * **资讯中心**:
-  * 汇聚来自 `neuroSangSpider` 项目的最新资讯与更新。
+  * 汇聚来自 [`neuroSangSpider`](https://github.com/qingchenyouforcc/neuroSangSpider) 项目的最新资讯与更新。
   * 获取 `Evil vs Zombies` 游戏社区的最新动态。
 
 ## 🔧 开发环境配置
@@ -82,7 +82,7 @@
 2.  创建您的特性分支
 3.  提交您的更改
 4.  将更改推送到分支
-5.  创建一个 Pull Request到master分支
+5.  创建一个 Pull Request 到 master 分支
 
 ## 📄 开源协议
 
